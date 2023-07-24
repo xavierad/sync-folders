@@ -27,28 +27,8 @@ class Syncronizer:
         self.logger.info('Syncronizer setup!')
         self.logger.info(f'Folder <{self.source_path}> will be syncronized to <{self.target_path}> every {self.interval} second(s)')    
 
-    def syncronize(self) -> None:
-        
-        self.logger.info(f'Syncronizing started!')
-        self._sync()
-        while True:
-            time.sleep(self.interval)
-            try: 
-                self.logger.info('Checking for changes...')
-                self._sync()
-
-            except (KeyboardInterrupt, IOError, OSError, BaseException) as exception:
-                self.logger.info(f'Syncronizing finished!')
-                raise exception
-
     def _is_same(self, source: str, target: str) -> bool:
-        source_stat = os.stat(source)
-        target_stat = os.stat(target)
-
-        is_same_size: bool = source_stat.st_size == target_stat.st_size
-        is_expired: bool = (target_stat.st_mtime - source_stat.st_mtime) > self.expiration_time
-
-        return is_same_size and not is_expired
+        return os.stat(source).st_size == os.stat(target).st_size
     
     def _check_source(self, directories: List[str]) -> List[str]:
         for root, dirs, files in os.walk(self.source_path):
@@ -105,10 +85,19 @@ class Syncronizer:
         directories_to_sync: List[str] = self._check_source(directories=[])
         self._check_target(directories=directories_to_sync)
 
-
+    def syncronize(self) -> None:
         
+        self.logger.info(f'Syncronizing started!')
+        self._sync()
+        while True:
+            time.sleep(self.interval)
+            try: 
+                self.logger.info('Checking for changes...')
+                self._sync()
 
-
+            except (KeyboardInterrupt, IOError, OSError, BaseException) as exception:
+                self.logger.info(f'Syncronizing finished!')
+                raise exception
 
 
 
