@@ -1,7 +1,7 @@
 import argparse
+import logging
 
-from meta.meta_folder import MetaFolder
-from sycnronizer.syncronizer import Syncronizer
+from syncronizer.syncronizer import Syncronizer
 
 
 EXPIRATION_TIME = 120
@@ -21,17 +21,19 @@ source_path: str = args.source
 replica_path: str = args.replica
 log_path: str = args.log
 
-import logging
 logging.basicConfig(
-    filename=log_path, 
     encoding='utf-8', 
     level=logging.INFO, 
     format='%(asctime)s %(message)s', 
-    datefmt='%m/%d/%Y %I:%M:%S'
+    datefmt='%m/%d/%Y %I:%M:%S',
+    handlers=[
+        logging.FileHandler(log_path),
+        logging.StreamHandler()
+    ]
 )
-logging.info("Running Urban Planning")
 
-logger = logging.getLogger('urbanGUI')
+logger = logging.getLogger('FolderSyncronizer')
+
 sync = Syncronizer(source_path=source_path, target_path=replica_path, logger=logger)
 
 sync.syncronize()

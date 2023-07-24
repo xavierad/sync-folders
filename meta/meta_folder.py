@@ -1,11 +1,12 @@
+import logging
 import os
-from typing import Set
+from typing import List
 
-from meta.meta_file import MetaFile
+from meta.meta_item import MetaFile
 
 
 class MetaFolder:
-    def __init__(self, path: str) -> None:
+    def __init__(self, path: str, logger: logging.Logger) -> None:
         """Class to represent a folder which can contain other 
         MetaFolder folders and MetaFile files.
 
@@ -13,40 +14,44 @@ class MetaFolder:
             path (str): folder directory 
         """
         self.path = path
-        self._meta = os.stat(path)
-        self.folders: Set[MetaFolder] = self._get_subfolders()
-        self.files: Set[MetaFile] = self._get_files()
+        if not os.path.exists(self.path):
+            os.makedirs(self.path)
 
-    @classmethod
-    def _get_subfolders(cls) -> Set[MetaFolder]:
+        self._meta = os.stat(path)
+        self.folders: List[MetaFolder] = self._get_subfolders()
+        self.files: List[MetaFile] = self._get_files()
+        self.logger = logger
+
+    
+    def _get_subfolders(self) -> List:
         """Get folders under the folder directory.
 
         Returns:
-            Set[MetaFolder]: a set of MetaFolder folders
+            List[MetaFolder]: a list of MetaFolder folders
         """
-        directory_list: Set[MetaFolder] = Set([
-            cls(path=dir)
-            for dir in os.listdir(cls.path)
+        directory_list: List[MetaFolder] = [
+            MetaFolder(path=dir)
+            for dir in os.listdir(self.path)
             if os.path.isdir(dir)
-        ])               
+        ]
 
         return directory_list
 
-    def _get_files(self) -> Set[MetaFile]:
+    def _get_files(self) -> List[MetaFile]:
         """Get files under the folder directory.
 
         Returns:
-            Set[MetaFile]: a set of MetaFile files
+            List[MetaFile]: a list of MetaFile files
         """
-        files_list: Set[MetaFile] = Set([
+        files_list: List[MetaFile] = [
             MetaFile(path=dir)
             for dir in os.listdir(self.path)
             if os.path.isfile(dir)
-        ])               
+        ]
 
         return files_list
     
-    def _eq_files(self, other: MetaFolder) -> bool:
+    def _get_files_to_sync(self, other: object) -> List[MetaFile]:
         """Checks if the files in this folder are equal to the 
         ones under the directory corresponding to other
 
@@ -56,12 +61,15 @@ class MetaFolder:
         Returns:
             bool: True if are the same
         """
-        for file, other_file in zip(self.files, other.files):
-            if file != other_file:
-                return False
-        return True
+        files_to_be_synced: List[MetaFile] = [
+            file
+            for file, other_file in zip(self.files, other.files)
+            if file != other_file
+        ]
+                
+        return files_to_be_synced
 
-    def __eq__(self, other: MetaFolder) -> bool:
+    def __eq__(self, other: object) -> List[MetaFile]:
         return self.path == other.path and \
             self._meta.st_size == other._meta.st_size and \
             self.folders == other.folders and \
