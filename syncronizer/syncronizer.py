@@ -84,6 +84,8 @@ class Syncronizer:
                 else:
                     self.logger.info(f'No changes detected in {source_item}')
 
+        return directories
+
     def _check_target(self, directories: List[str]) -> None:
         for _, dirs, files in os.walk(self.target_path):
             for file in files:
