@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 
 from syncronizer.syncronizer import Syncronizer
 
@@ -20,6 +21,9 @@ args = parser.parse_args()
 source_path: str = args.source
 replica_path: str = args.replica
 log_path: str = args.log
+
+if os.path.exists(log_path):
+    os.remove(log_path)
 
 logging.basicConfig(
     encoding='utf-8', 
