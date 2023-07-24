@@ -1,7 +1,8 @@
-07/24/2023 06:21:57 Syncronizer setup!
-07/24/2023 06:21:57 Folder <source_folder> will be syncronized to <replica> every 10 second(s)
-07/24/2023 06:21:57 Syncronizing started!
-07/24/2023 06:21:57 No changes detected in source_folder/empty_folder
-07/24/2023 06:21:57 No changes detected in source_folder/sedond_folder
-07/24/2023 06:21:57 Synced source_folder/first_level.txt -> replica/first_level.txt
-07/24/2023 06:21:57 No changes detected in source_folder/sedond_folder/this_file.txt
+07/24/2023 06:55:29 Syncronizer setup!
+07/24/2023 06:55:29 Folder <source_folder> will be syncronized to <replica> every 10 second(s)
+07/24/2023 06:55:29 Syncronizing started!
+07/24/2023 06:55:29 No changes detected in source_folder/empty_folder
+07/24/2023 06:55:29 No changes detected in source_folder/sedond_folder
+07/24/2023 06:55:29 No changes detected in source_folder/first_level.txt
+07/24/2023 06:55:29 No changes detected in source_folder/sedond_folder/first_level.txt
+07/24/2023 06:55:29 No changes detected in source_folder/sedond_folder/this_file.txt
