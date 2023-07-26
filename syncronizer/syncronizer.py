@@ -30,39 +30,34 @@ class Syncronizer:
     def _is_same(self, source: str, target: str) -> bool:
         return os.stat(source).st_size == os.stat(target).st_size
     
+    def _copy_item(self, item: str, target: str) -> None:
+        if os.path.isfile(item):
+            shutil.copyfile(item, target)
+            return
+        shutil.copytree(item, target)
+
+    
+    def _copy_items(self, root: str, directories: List[str], items: List[str]) -> List[str]:
+        for item in items:
+            source_item = os.path.join(root, item)
+            item_in_replica = source_item.replace(self.source_path, self.target_path)
+
+            directories.append(item)
+            if not os.path.exists(item_in_replica):
+                self._copy_item(source_item, item_in_replica)
+                self.logger.info(f'Synced {source_item} -> {item_in_replica}')
+            elif not self._is_same(source_item, item_in_replica):
+                shutil.rmtree(item_in_replica)
+                self._copy_item(source_item, item_in_replica)
+                self.logger.info(f'Synced {source_item} -> {item_in_replica}')
+            else:
+                self.logger.info(f'No changes detected in {source_item}')
+        return directories
+
     def _check_source(self, directories: List[str]) -> List[str]:
         for root, dirs, files in os.walk(self.source_path):
-            for dir in dirs:
-                source_item = os.path.join(root, dir)
-                item_in_replica = source_item.replace(self.source_path, self.target_path)
-
-                directories.append(dir)
-                if not os.path.exists(item_in_replica):
-                    shutil.copytree(source_item, item_in_replica)
-                    self.logger.info(f'Synced {source_item} -> {item_in_replica}')
-                elif not self._is_same(source_item, item_in_replica):
-                    shutil.rmtree(item_in_replica)
-                    shutil.copytree(source_item, item_in_replica)
-                    self.logger.info(f'Synced {source_item} -> {item_in_replica}')
-                else:
-                    self.logger.info(f'No changes detected in {source_item}')
-
-            
-            for file in files:
-                source_item = os.path.join(root, file)
-                item_in_replica = source_item.replace(self.source_path, self.target_path)
-
-                directories.append(file)
-                if not os.path.exists(item_in_replica):
-                    shutil.copyfile(source_item, item_in_replica)
-                    self.logger.info(f'Synced {source_item} -> {item_in_replica}')
-
-                elif not self._is_same(source_item, item_in_replica):
-                    os.remove(item_in_replica)                        
-                    shutil.copyfile(source_item, item_in_replica)
-                    self.logger.info(f'Synced {source_item} -> {item_in_replica}')
-                else:
-                    self.logger.info(f'No changes detected in {source_item}')
+            directories = self._copy_items(root=root, directories=directories, items=dirs)
+            directories = self._copy_items(root=root, directories=directories, items=files)
 
         return directories
 

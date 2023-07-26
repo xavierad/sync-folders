@@ -41,3 +41,4 @@ logger = logging.getLogger('FolderSyncronizer')
 sync = Syncronizer(source_path=source_path, target_path=replica_path, logger=logger)
 
 sync.syncronize()
+
