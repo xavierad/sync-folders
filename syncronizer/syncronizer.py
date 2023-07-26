@@ -36,7 +36,6 @@ class Syncronizer:
             return
         shutil.copytree(item, target)
 
-    
     def _copy_items(self, root: str, directories: List[str], items: List[str]) -> List[str]:
         for item in items:
             source_item = os.path.join(root, item)
@@ -45,11 +44,11 @@ class Syncronizer:
             directories.append(item)
             if not os.path.exists(item_in_replica):
                 self._copy_item(source_item, item_in_replica)
-                self.logger.info(f'Synced {source_item} -> {item_in_replica}')
+                self.logger.info(f'CREATED - Synced {source_item} -> {item_in_replica}')
             elif not self._is_same(source_item, item_in_replica):
                 shutil.rmtree(item_in_replica)
                 self._copy_item(source_item, item_in_replica)
-                self.logger.info(f'Synced {source_item} -> {item_in_replica}')
+                self.logger.info(f'COPY - Synced {source_item} -> {item_in_replica}')
             else:
                 self.logger.info(f'No changes detected in {source_item}')
         return directories
@@ -67,14 +66,14 @@ class Syncronizer:
                 replica_item: str = os.path.join(self.target_path, file)
                 if file not in directories:
                     os.remove(replica_item)
-                    self.logger.info(f'Removed {replica_item}')
+                    self.logger.info(f'REMOVE - Removed {replica_item}')
 
             for dir in dirs:
                 replica_item: str = os.path.join(self.target_path, dir)
 
                 if dir not in directories:
                     shutil.rmtree(replica_item)
-                    self.logger.info(f'Removed {replica_item}')
+                    self.logger.info(f'REMOVE - Removed {replica_item}')
 
     def _sync(self) -> None:
         directories_to_sync: List[str] = self._check_source(directories=[])
